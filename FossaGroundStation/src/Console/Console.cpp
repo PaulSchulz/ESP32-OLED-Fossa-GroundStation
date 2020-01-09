@@ -20,12 +20,178 @@
 #include "Console.h"
 #include "Arduino.h"
 
+//const char* ntpServer = "pool.ntp.org";
+//const long  gmtOffset_sec = 0; // 3600;         // 3600 for Spain
+//const int   daylightOffset_sec = 0; // 3600;
+
+void consolePrintLocalTime();
+void consolePrintControls();
+void consoleSwitchTestmode();
+
 Console::Console(ConfigManager& x)
 : configManager(x)
 {
   
 }
 
-void Console::init(){
-  Serial.print(F("[Serial] Initializing ... "));
+// Initialisation
+void Console::doInit(){
+  Serial.print(F("[Console] Initializing ... "));
+  Serial.println(F("success!"));
+}
+
+// Setup
+void Console::doSetup(){
+  Serial.println();
+  // consolePrintLocalTime();
+  Serial.printf("Fossa Ground station Version %d\n", status.version); 
+  Serial.printf("Press 'h' for command options.\n");
+  Serial.println();
+}
+
+// Function to call every loop
+void Console::doLoop(){
+
+    // get the first character
+    char serialCmd = Serial.read();
+
+    // wait for a bit to receive any trailing characters
+    delay(50);
+
+    // dump the serial buffer
+    while(Serial.available()) {
+      Serial.read();
+    }
+
+    // process serial command
+    switch(serialCmd) {
+      case 'h':
+        consolePrintControls();
+        break; 
+      case 'c':
+        configManager.printConfig();
+        break;
+      case 'p':
+        if (!radio.isReady()) {
+          Serial.println(F("Radio is not ready, please configure it properly before using this command."));
+          break;
+        }
+        radio.sendPing();
+        break;
+      case 'i':
+        if (!radio.isReady()) {
+          Serial.println(F("Radio is not ready, please configure it properly before using this command."));
+          break;
+        }
+        radio.requestInfo();
+        break;
+      case 'l':
+        if (!radio.isReady()) {
+          Serial.println(F("Radio is not ready, please configure it properly before using this command."));
+          break;
+        }
+        radio.requestPacketInfo();
+        break;
+      case 'r':
+        if (!radio.isReady()) {
+          Serial.println(F("Radio is not ready, please configure it properly before using this command."));
+          break;
+        }
+        Serial.println(F("Enter message to be sent:"));
+        Serial.println(F("(max 32 characters, end with LF or CR+LF)"));
+        {
+          // get data to be retransmited
+          char optData[32];
+          uint8_t bufferPos = 0;
+          while(bufferPos < 32) {
+            while(!Serial.available());
+            char c = Serial.read();
+            Serial.print(c);
+            if((c != '\r') && (c != '\n')) {
+              optData[bufferPos] = c;
+              bufferPos++;
+            } else {
+              break;
+            }
+          }
+          optData[bufferPos] = '\0';
+
+          // wait for a bit to receive any trailing characters
+          delay(100);
+
+          // dump the serial buffer
+          while(Serial.available()) {
+            Serial.read();
+          }
+
+          Serial.println();
+          radio.requestRetransmit(optData);
+        }
+        break;
+      case 'e':
+        configManager.resetAllConfig();
+        ESP.restart();
+        break;
+      case 't':
+        consoleSwitchTestmode();
+        ESP.restart();
+        break;
+      case 'b':
+        ESP.restart();
+        break;
+       
+      default:
+        Serial.print(F("Unknown command: "));
+        Serial.println(serialCmd);
+        break;
+    }
+
+}
+
+void consolePrintLocalTime()
+{
+  struct tm timeinfo;
+  if(!getLocalTime(&timeinfo)){
+    Serial.println("Failed to obtain time");
+    return;
+  }
+  Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
+}
+
+void consoleSwitchTestmode() {
+  char temp_station[32];
+  if ((configManager.getThingName()[0]=='t') 
+      && (configManager.getThingName()[1]=='e')
+      && (configManager.getThingName()[2]=='s')
+      && (configManager.getThingName()[4]=='_')) {
+    Serial.println(F("Changed from test mode to normal mode"));
+    for (byte a=5; a<=strlen(configManager.getThingName()); a++ ) {
+      configManager.getThingName()[a-5]=configManager.getThingName()[a];
+    }
+  }
+  else
+  {
+    strcpy(temp_station,"test_");
+    strcat(temp_station,configManager.getThingName());
+    strcpy(configManager.getThingName(),temp_station);
+    Serial.println(F("Changed from normal mode to test mode"));
+  }
+
+  configManager.configSave();
+}
+
+// function to print controls
+void consolePrintControls() {
+  Serial.println();
+  Serial.println(F("------------- Controls -------------"));
+  Serial.println(F("h - display this help message"       ));
+  Serial.println(F("c - display configuration"           ));
+  Serial.println(F("p - send ping frame"                 ));
+  Serial.println(F("i - request satellite info"          ));
+  Serial.println(F("l - request last packet info"        ));
+  Serial.println(F("r - send message to be retransmitted"));
+  Serial.println(F("t - change the test mode and restart"));
+  Serial.println(F("e - erase board config and reset"    ));
+  Serial.println(F("b - reboot the board"                ));
+  Serial.println(F("------------------------------------"));
 }
