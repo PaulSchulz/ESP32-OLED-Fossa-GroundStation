@@ -20,7 +20,6 @@
 #include "Console.h"
 #include "Arduino.h"
 
-<<<<<<< HEAD
 //const char* ntpServer = "pool.ntp.org";
 //const long  gmtOffset_sec = 0; // 3600;         // 3600 for Spain
 //const int   daylightOffset_sec = 0; // 3600;
@@ -29,15 +28,12 @@ void consolePrintLocalTime();
 void consolePrintControls();
 void consoleSwitchTestmode();
 
-=======
->>>>>>> Add initial template files
 Console::Console(ConfigManager& x)
 : configManager(x)
 {
   
 }
 
-<<<<<<< HEAD
 // Initialisation
 void Console::doInit(){
   Serial.print(F("[Console] Initializing ... "));
@@ -199,8 +195,3 @@ void consolePrintControls() {
   Serial.println(F("b - reboot the board"                ));
   Serial.println(F("------------------------------------"));
 }
-=======
-void Console::init(){
-  Serial.print(F("[Serial] Initializing ... "));
-}
->>>>>>> Add initial template files
