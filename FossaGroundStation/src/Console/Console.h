@@ -21,19 +21,29 @@
 #define _FOSSA_CONSOLE_H
 
 #include "../ConfigManager/ConfigManager.h"
+<<<<<<< HEAD
 #include "../Radio/Radio.h"
 #include "../Status.h"
 
 extern Status status;
 extern ConfigManager configManager;
 extern Radio radio;
+=======
+#include "../Status.h"
+
+extern Status status;
+>>>>>>> Add initial template files
 
 class Console {
 public:
   Console(ConfigManager& x);
+<<<<<<< HEAD
   void doInit();
   void doSetup();
   void doLoop();
+=======
+  void init();
+>>>>>>> Add initial template files
 
 private:
   ConfigManager& configManager;
