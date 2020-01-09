@@ -71,6 +71,7 @@
 #include "src/Status.h"
 #include "src/Radio/Radio.h"
 #include "src/ArduinoOTA/ArduinoOTA.h"
+#include "src/Console/Console.h"
 
 #if MQTT_MAX_PACKET_SIZE != 1000
 "Remeber to change libraries/PubSubClient/src/PubSubClient.h"
@@ -85,16 +86,15 @@
 ConfigManager configManager;
 MQTT_Client mqtt(configManager);
 Radio radio(configManager, mqtt);
+Console console(configManager);
 
 const char* ntpServer = "pool.ntp.org";
 const long  gmtOffset_sec = 0; // 3600;         // 3600 for Spain
 const int   daylightOffset_sec = 0; // 3600;
-void printLocalTime();
 
 // Global status
 Status status;
 
-void printControls();
 void switchTestmode();
 
 void wifiConnected() {
@@ -115,25 +115,26 @@ void wifiConnected() {
 	  ESP_LOGD (LOG_TAG, "Set timezone value as %s", configManager.getTZ());
 	  tzset();
   }
+  // printLocalTime();
 
-  printLocalTime();
   configManager.delay(1000); // wait to show the connected screen
 
   mqtt.begin();
 
   // TODO: Make this beautiful
   displayShowWaitingMqttConnection();
-  printControls();
 }
 
 void setup() {
   Serial.begin(115200);
+  console.doInit();
   delay(299);
-  Serial.printf("Fossa Ground station Version %d\n", status.version);
   configManager.setWifiConnectionCallback(wifiConnected);
   configManager.init();
   // make sure to call doLoop at least once before starting to use the configManager
   configManager.doLoop();
+
+
   pinMode (configManager.getBoardConfig().PROG__BUTTON, INPUT_PULLUP);
   displayInit();
   displayShowInitialCredits();
@@ -177,11 +178,13 @@ void setup() {
     displayShowStaMode();
   }
   delay(500);  
+
+  // Display prompt on console
+  console.doSetup();
 }
 
 void loop() {
   configManager.doLoop();
-
   static bool wasConnected = false;
   if (!configManager.isConnected()){
     if (wasConnected){
@@ -190,7 +193,7 @@ void loop() {
       else 
         displayShowStaMode();
     }
-    return;
+    // return;
   }
   wasConnected = true;
   mqtt.loop();
@@ -198,146 +201,11 @@ void loop() {
   
   if(Serial.available()) {
     radio.disableInterrupt();
-
-    // get the first character
-    char serialCmd = Serial.read();
-
-    // wait for a bit to receive any trailing characters
-    delay(50);
-
-    // dump the serial buffer
-    while(Serial.available()) {
-      Serial.read();
-    }
-
-    // process serial command
-    switch(serialCmd) {
-      case 'p':
-        if (!radio.isReady()) {
-          Serial.println(F("Radio is not ready, please configure it properly before using this command."));
-          break;
-        }
-        radio.sendPing();
-        break;
-      case 'i':
-        if (!radio.isReady()) {
-          Serial.println(F("Radio is not ready, please configure it properly before using this command."));
-          break;
-        }
-        radio.requestInfo();
-        break;
-      case 'l':
-        if (!radio.isReady()) {
-          Serial.println(F("Radio is not ready, please configure it properly before using this command."));
-          break;
-        }
-        radio.requestPacketInfo();
-        break;
-      case 'r':
-        if (!radio.isReady()) {
-          Serial.println(F("Radio is not ready, please configure it properly before using this command."));
-          break;
-        }
-        Serial.println(F("Enter message to be sent:"));
-        Serial.println(F("(max 32 characters, end with LF or CR+LF)"));
-        {
-          // get data to be retransmited
-          char optData[32];
-          uint8_t bufferPos = 0;
-          while(bufferPos < 32) {
-            while(!Serial.available());
-            char c = Serial.read();
-            Serial.print(c);
-            if((c != '\r') && (c != '\n')) {
-              optData[bufferPos] = c;
-              bufferPos++;
-            } else {
-              break;
-            }
-          }
-          optData[bufferPos] = '\0';
-
-          // wait for a bit to receive any trailing characters
-          delay(100);
-
-          // dump the serial buffer
-          while(Serial.available()) {
-            Serial.read();
-          }
-
-          Serial.println();
-          radio.requestRetransmit(optData);
-        }
-        break;
-      case 'e':
-        configManager.resetAllConfig();
-        ESP.restart();
-        break;
-      case 't':
-        switchTestmode();
-        ESP.restart();
-        break;
-      case 'b':
-        ESP.restart();
-        break;
-       
-      default:
-        Serial.print(F("Unknown command: "));
-        Serial.println(serialCmd);
-        break;
-    }
-
+    console.doLoop();
     radio.enableInterrupt();
   }
-
-  if (!radio.isReady()) {
-    displayShowLoRaError();
-    return;
-  }
-
+  
   displayUpdate();
 
   radio.listen();
-}
-
-void switchTestmode() {
-  char temp_station[32];
-  if ((configManager.getThingName()[0]=='t') &&  (configManager.getThingName()[1]=='e') && (configManager.getThingName()[2]=='s') && (configManager.getThingName()[4]=='_')) {
-    Serial.println(F("Changed from test mode to normal mode"));
-    for (byte a=5; a<=strlen(configManager.getThingName()); a++ ) {
-      configManager.getThingName()[a-5]=configManager.getThingName()[a];
-    }
-  }
-  else
-  {
-    strcpy(temp_station,"test_");
-    strcat(temp_station,configManager.getThingName());
-    strcpy(configManager.getThingName(),temp_station);
-    Serial.println(F("Changed from normal mode to test mode"));
-  }
-
-  configManager.configSave();
-}
-
-void printLocalTime()
-{
-  struct tm timeinfo;
-  if(!getLocalTime(&timeinfo)){
-    Serial.println("Failed to obtain time");
-    return;
-  }
-  Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
-}
-
-// function to print controls
-void printControls() {
-  Serial.println(F("------------- Controls -------------"));
-  Serial.println(F("p - send ping frame"));
-  Serial.println(F("i - request satellite info"));
-  Serial.println(F("l - request last packet info"));
-  Serial.println(F("r - send message to be retransmitted"));
-  Serial.println(F("t - change the test mode and restart"));
-  Serial.println(F("e - erase board config and reset"));
-  Serial.println(F("b - reboot the board"));
-  Serial.println(F("------------------------------------"));
 }

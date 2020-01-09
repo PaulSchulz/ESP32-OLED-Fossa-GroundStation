@@ -21,14 +21,19 @@
 #define _FOSSA_CONSOLE_H
 
 #include "../ConfigManager/ConfigManager.h"
+#include "../Radio/Radio.h"
 #include "../Status.h"
 
 extern Status status;
+extern ConfigManager configManager;
+extern Radio radio;
 
 class Console {
 public:
   Console(ConfigManager& x);
-  void init();
+  void doInit();
+  void doSetup();
+  void doLoop();
 
 private:
   ConfigManager& configManager;
