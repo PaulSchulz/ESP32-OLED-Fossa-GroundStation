@@ -69,9 +69,11 @@ void Console::doLoop(){
         consolePrintControls();
         break; 
       case 'c':
+        Serial.println(F("Configuration"));
         configManager.printConfig();
         break;
       case 'p':
+        Serial.println(F("Send ping frame"));
         if (!radio.isReady()) {
           Serial.println(F("Radio is not ready, please configure it properly before using this command."));
           break;
@@ -79,6 +81,7 @@ void Console::doLoop(){
         radio.sendPing();
         break;
       case 'i':
+        Serial.println(F("Request satellite info"));
         if (!radio.isReady()) {
           Serial.println(F("Radio is not ready, please configure it properly before using this command."));
           break;
@@ -86,6 +89,7 @@ void Console::doLoop(){
         radio.requestInfo();
         break;
       case 'l':
+        Serial.println(F("Request last packet info"));
         if (!radio.isReady()) {
           Serial.println(F("Radio is not ready, please configure it properly before using this command."));
           break;
@@ -93,6 +97,7 @@ void Console::doLoop(){
         radio.requestPacketInfo();
         break;
       case 'r':
+        Serial.println(F("Send message to be retransmitted"));
         if (!radio.isReady()) {
           Serial.println(F("Radio is not ready, please configure it properly before using this command."));
           break;
@@ -129,14 +134,28 @@ void Console::doLoop(){
         }
         break;
       case 'e':
-        configManager.resetAllConfig();
-        ESP.restart();
+        Serial.println(F("Erase board config and restart."));
+        Serial.print(F("Are you sure (y/N)?"));
+        while(!Serial.available());
+        {
+          char c = Serial.read();
+          Serial.println(c);
+          if((c == 'y') || (c == 'Y')) {
+            Serial.println(F("** Reset and restart ***"));
+            configManager.resetAllConfig();
+            ESP.restart();
+          } else {
+           Serial.println(F("abort - No changes made"));
+          }
+        }
         break;
       case 't':
+        Serial.println(F("Change the test mode and restart"));
         consoleSwitchTestmode();
         ESP.restart();
         break;
       case 'b':
+        Serial.println(F("Reboot the board"));
         ESP.restart();
         break;
        
