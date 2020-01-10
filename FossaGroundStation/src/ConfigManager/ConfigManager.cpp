@@ -239,13 +239,15 @@ void ConfigManager::printConfig() {
   Serial.println(getMqttPort());
   Serial.print(F("MQTT Server: "));
   Serial.println(getMqttServer());
+  Serial.print(F("MQTT User: "));
+  Serial.println(getMqttUser());
   Serial.print(F("MQTT Pass: "));
   Serial.println(getMqttPass());
-  Serial.print(F("Latitude: "));
+  Serial.print(F("Station Latitude: "));
   Serial.println(getLatitude());
-  Serial.print(F("Longitude: "));
+  Serial.print(F("Station Longitude: "));
   Serial.println(getLongitude());
-  Serial.print(F("tz: "));
+  Serial.print(F("Station tz: "));
   Serial.println(getTZ());
   Serial.print(F("board: "));
   Serial.print(getBoard());
