@@ -1,0 +1,599 @@
+[
+    {
+        "id": "401d6391.6408dc",
+        "type": "tab",
+        "label": "Fossa Groundstation Monitor",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "e47e82e0.d741c",
+        "type": "debug",
+        "z": "401d6391.6408dc",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 550,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "11083fea.5f3e8",
+        "type": "debug",
+        "z": "401d6391.6408dc",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "x": 630,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "754a12e9.9da53c",
+        "type": "status",
+        "z": "401d6391.6408dc",
+        "name": "",
+        "scope": [
+            "648e0f60.12357"
+        ],
+        "x": 100,
+        "y": 520,
+        "wires": [
+            [
+                "a2ae46ea.4f2cd8"
+            ]
+        ],
+        "outputLabels": [
+            "status"
+        ]
+    },
+    {
+        "id": "a31cd297.98a13",
+        "type": "ui_text",
+        "z": "401d6391.6408dc",
+        "group": "9a3f8a88.062948",
+        "order": 1,
+        "width": "6",
+        "height": "1",
+        "name": "",
+        "label": "Status",
+        "format": "{{payload}}",
+        "layout": "row-left",
+        "x": 430,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "a2ae46ea.4f2cd8",
+        "type": "function",
+        "z": "401d6391.6408dc",
+        "name": "Process Status",
+        "func": "if (msg.status.fill === 'green') {\n msg.payload = \"Connected\";\n} else {\n    msg.payload = \"Not Connected\";\n}\nmsg.topic = \"status\";\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 260,
+        "y": 520,
+        "wires": [
+            [
+                "a31cd297.98a13",
+                "87cd4d0d.77e5b"
+            ]
+        ]
+    },
+    {
+        "id": "87cd4d0d.77e5b",
+        "type": "debug",
+        "z": "401d6391.6408dc",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "x": 430,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "d221caeb.f24588",
+        "type": "json",
+        "z": "401d6391.6408dc",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 630,
+        "y": 260,
+        "wires": [
+            [
+                "305e66f4.bd403a",
+                "17acf205.71135e",
+                "6b7a4434.570c3c",
+                "d8247e0a.db521",
+                "b8799345.36f5a"
+            ]
+        ]
+    },
+    {
+        "id": "305e66f4.bd403a",
+        "type": "ui_text",
+        "z": "401d6391.6408dc",
+        "group": "4f0a6a57.db7bc4",
+        "order": 1,
+        "width": "6",
+        "height": "1",
+        "name": "",
+        "label": "Station",
+        "format": "{{payload.station}}",
+        "layout": "row-left",
+        "x": 820,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "17acf205.71135e",
+        "type": "ui_text",
+        "z": "401d6391.6408dc",
+        "group": "4f0a6a57.db7bc4",
+        "order": 1,
+        "width": "6",
+        "height": "1",
+        "name": "",
+        "label": "Lat,Long",
+        "format": "{{payload.station_location}}",
+        "layout": "row-left",
+        "x": 820,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "6b7a4434.570c3c",
+        "type": "ui_text",
+        "z": "401d6391.6408dc",
+        "group": "4f0a6a57.db7bc4",
+        "order": 1,
+        "width": "6",
+        "height": "1",
+        "name": "",
+        "label": "Version",
+        "format": "{{payload.version}}",
+        "layout": "row-left",
+        "x": 820,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "d8247e0a.db521",
+        "type": "ui_text",
+        "z": "401d6391.6408dc",
+        "group": "4f0a6a57.db7bc4",
+        "order": 1,
+        "width": "6",
+        "height": "1",
+        "name": "",
+        "label": "Board",
+        "format": "{{payload.board}}",
+        "layout": "row-left",
+        "x": 810,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "cd5981d0.6cf5f",
+        "type": "ui_text",
+        "z": "401d6391.6408dc",
+        "group": "4f0a6a57.db7bc4",
+        "order": 1,
+        "width": "6",
+        "height": "1",
+        "name": "",
+        "label": "Last Ping",
+        "format": "{{payload}}",
+        "layout": "row-left",
+        "x": 820,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "db8db7e4.90a208",
+        "type": "change",
+        "z": "401d6391.6408dc",
+        "name": "timestamp",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "$now()",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 650,
+        "y": 160,
+        "wires": [
+            [
+                "cd5981d0.6cf5f",
+                "3f435ba9.273624"
+            ]
+        ]
+    },
+    {
+        "id": "3f435ba9.273624",
+        "type": "debug",
+        "z": "401d6391.6408dc",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "x": 810,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "21fc74d9.14bc0c",
+        "type": "mqtt in",
+        "z": "401d6391.6408dc",
+        "name": "",
+        "topic": "fossa/#",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "90fee937.32f298",
+        "x": 90,
+        "y": 40,
+        "wires": [
+            [
+                "ee430761.0eed78",
+                "cb1a079a.593a08"
+            ]
+        ]
+    },
+    {
+        "id": "eedbfd8.22514",
+        "type": "ui_text",
+        "z": "401d6391.6408dc",
+        "group": "68d70f38.4ff11",
+        "order": 1,
+        "width": "6",
+        "height": "1",
+        "name": "",
+        "label": "Global Position OLED",
+        "format": "{{payload}}",
+        "layout": "row-left",
+        "x": 580,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "9f87c004.8187c",
+        "type": "switch",
+        "z": "401d6391.6408dc",
+        "name": "device",
+        "property": "subtopic",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "ping",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "welcome",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "status",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 4,
+        "x": 350,
+        "y": 180,
+        "wires": [
+            [
+                "db8db7e4.90a208"
+            ],
+            [
+                "d221caeb.f24588"
+            ],
+            [
+                "96a998cc.391248"
+            ],
+            [
+                "11083fea.5f3e8"
+            ]
+        ]
+    },
+    {
+        "id": "ee430761.0eed78",
+        "type": "function",
+        "z": "401d6391.6408dc",
+        "name": "Process message",
+        "func": "var data = msg.topic.split(\"/\");\n\nif(data[0] == \"fossa\") {\n    if(data[1] == 'global') {\n        return [msg, null]\n    } else {\n        msg.mqttuser = data[1];\n        msg.station  = data[2];\n        msg.subtopic = data[3];\n\n        if(data[2].match(/test_/)){\n            msg.test = 1;\n        }\n        return [null, msg]\n    }\n}\n\nreturn [null, null];",
+        "outputs": 2,
+        "noerr": 0,
+        "x": 150,
+        "y": 120,
+        "wires": [
+            [
+                "b1ec182e.573668"
+            ],
+            [
+                "9f87c004.8187c"
+            ]
+        ],
+        "outputLabels": [
+            "fossa/global/#",
+            "fossa/USER/DEVICE/#"
+        ]
+    },
+    {
+        "id": "b8799345.36f5a",
+        "type": "change",
+        "z": "401d6391.6408dc",
+        "name": "timestamp",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "$now()",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 830,
+        "y": 260,
+        "wires": [
+            [
+                "580c1a15.18e0c4"
+            ]
+        ]
+    },
+    {
+        "id": "580c1a15.18e0c4",
+        "type": "ui_text",
+        "z": "401d6391.6408dc",
+        "group": "4f0a6a57.db7bc4",
+        "order": 1,
+        "width": "6",
+        "height": "1",
+        "name": "",
+        "label": "Last Welcome",
+        "format": "{{payload}}",
+        "layout": "row-left",
+        "x": 1000,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "31d27740.98aab8",
+        "type": "ui_text",
+        "z": "401d6391.6408dc",
+        "group": "4f0a6a57.db7bc4",
+        "order": 1,
+        "width": "6",
+        "height": "1",
+        "name": "",
+        "label": "Status",
+        "format": "{{payload}}",
+        "layout": "row-left",
+        "x": 810,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "b0b4c06b.d7655",
+        "type": "ui_text",
+        "z": "401d6391.6408dc",
+        "group": "4f0a6a57.db7bc4",
+        "order": 1,
+        "width": "6",
+        "height": "1",
+        "name": "",
+        "label": "Last Status",
+        "format": "{{payload}}",
+        "layout": "row-left",
+        "x": 990,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "13db44d0.f32a2b",
+        "type": "change",
+        "z": "401d6391.6408dc",
+        "name": "timestamp",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "$now()",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 830,
+        "y": 480,
+        "wires": [
+            [
+                "b0b4c06b.d7655"
+            ]
+        ]
+    },
+    {
+        "id": "cb1a079a.593a08",
+        "type": "ui_template",
+        "z": "401d6391.6408dc",
+        "group": "9a3f8a88.062948",
+        "name": "Last message",
+        "order": 1,
+        "width": "6",
+        "height": "6",
+        "format": "<p><b>Last message:</b></p>\n<p>Station: <div ng-bind-html=\"msg.station\"></div></p>\n<p>MQTT User: <div ng-bind-html=\"msg.mqttuser\"></div></p>\n<p>Subtopic: <div ng-bind-html=\"msg.subtopic\"></div></p>\n<p>Test: <div ng-bind-html=\"msg.test\"></div></p>\n<p>Payload: <div ng-bind-html=\"msg.payload\"></div></p>\n",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "templateScope": "local",
+        "x": 280,
+        "y": 40,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b1ec182e.573668",
+        "type": "switch",
+        "z": "401d6391.6408dc",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 350,
+        "y": 120,
+        "wires": [
+            [
+                "e47e82e0.d741c",
+                "eedbfd8.22514"
+            ]
+        ]
+    },
+    {
+        "id": "96a998cc.391248",
+        "type": "switch",
+        "z": "401d6391.6408dc",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 630,
+        "y": 480,
+        "wires": [
+            [
+                "31d27740.98aab8",
+                "13db44d0.f32a2b"
+            ]
+        ]
+    },
+    {
+        "id": "9a3f8a88.062948",
+        "type": "ui_group",
+        "z": "",
+        "name": "MQTT",
+        "tab": "4e31b042.77924",
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "4f0a6a57.db7bc4",
+        "type": "ui_group",
+        "z": "",
+        "name": "Device",
+        "tab": "4e31b042.77924",
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "90fee937.32f298",
+        "type": "mqtt-broker",
+        "z": "",
+        "name": "FOSSA MQTT",
+        "broker": "fossa.apaluba.com",
+        "port": "8883",
+        "tls": "79459e12.5f319",
+        "clientid": "",
+        "usetls": true,
+        "compatmode": false,
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    },
+    {
+        "id": "68d70f38.4ff11",
+        "type": "ui_group",
+        "z": "",
+        "name": "Global",
+        "tab": "4e31b042.77924",
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "4e31b042.77924",
+        "type": "ui_tab",
+        "z": "",
+        "name": "Fossa Ground Station",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "79459e12.5f319",
+        "type": "tls-config",
+        "z": "",
+        "name": "",
+        "cert": "",
+        "key": "",
+        "ca": "",
+        "certname": "",
+        "keyname": "",
+        "caname": "",
+        "servername": "",
+        "verifyservercert": false
+    }
+]
