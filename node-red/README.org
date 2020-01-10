@@ -1,0 +1,31 @@
+* Fossa Groundstation and Node-RED
+
+This directory contains flow definitions for Node-RED that are useful
+for the FOSSA Project.
+
+See definitions in 'flows'
+
+Node-RED can be installed on a variety of platforms, mainly Linux
+based. See Node-RED Website for installation instructions. 
+https://nodered.org/docs/getting-started/
+
+** Fossa Groundstation Monitor (fossa-groundstaton-monitor)
+
+This flow connects to the FOSSA MQTT server and collects messages sent
+from the Groundstation(s) to the Fossa Network, as configured by a
+particular user.
+
+*** Quick Start
+Import the JSON file into Node-RED. No additonal plugins are required
+from the standard Node-RED installation (version 1.0.2).
+
+Configure the MQTT node with the credentials used to register a Fossa
+Groundstation to the Fossa MQTT server. (These are available from the
+FOSSA bot in the Fossasat-1 Community channel with a private message.)
+
+A user can receive data from multiple Groundstations which have been
+registered with the same login username and password. 
+
+
+
+
