@@ -39,7 +39,8 @@ public:
   void disableInterrupt();
   uint8_t listen();
   bool isReady() { return ready; }
-
+  int sendFrame(uint8_t functionId, const char* data = "");
+  
 private:
   PhysicalLayer* lora;
   ConfigManager& configManager;
@@ -47,7 +48,6 @@ private:
   void processReceivedFrame(uint8_t functionId, uint8_t *respOptData, size_t respLen);
   
   static void setFlag();
-  int sendFrame(uint8_t functionId, const char* data = "");
   bool ready = false;
   SPIClass spi;
 };
