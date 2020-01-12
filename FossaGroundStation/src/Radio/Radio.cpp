@@ -416,6 +416,15 @@ void Radio::processReceivedFrame(uint8_t functionId, uint8_t *respOptData, size_
 
     default:
       Serial.println(F("Unknown function ID!"));
+      {
+	Serial.printf("Function Id: %02x", functionId);
+        Serial.println();
+	int i;
+	for (i=0; i<respLen; i++){
+	  Serial.printf(" %02x", respOptData[i]);
+	}
+	Serial.println();
+      }
       break;
   }
 }
