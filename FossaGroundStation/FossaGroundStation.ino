@@ -198,12 +198,7 @@ void loop() {
   wasConnected = true;
   mqtt.loop();
   ArduinoOTA.handle();
-  
-  if(Serial.available()) {
-    radio.disableInterrupt();
-    console.doLoop();
-    radio.enableInterrupt();
-  }
+  console.doLoop();
   
   displayUpdate();
 

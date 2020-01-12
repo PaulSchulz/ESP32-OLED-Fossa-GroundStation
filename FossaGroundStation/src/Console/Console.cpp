@@ -50,121 +50,132 @@ void Console::doSetup(){
 }
 
 // Function to call every loop
-void Console::doLoop(){
+void Console::doLoop() {
+  if(!Serial.available()) {
+    return;
+  } 
 
-    // get the first character
-    char serialCmd = Serial.read();
+  radio.disableInterrupt();
+  // get the first character
+  char serialCmd = Serial.read();
 
-    // wait for a bit to receive any trailing characters
-    delay(50);
+  // wait for a bit to receive any trailing characters
+  delay(50);
 
-    // dump the serial buffer
-    while(Serial.available()) {
-      Serial.read();
-    }
+  // dump the serial buffer
+  while(Serial.available()) {
+    Serial.read();
+  }
 
-    // process serial command
-    switch(serialCmd) {
-      case 'h':
-        consolePrintControls();
-        break; 
-      case 'c':
-        Serial.println(F("Configuration"));
-        configManager.printConfig();
+  // process serial command
+  switch(serialCmd) {
+    case 'h':
+      consolePrintControls();
+      break; 
+    case 'c':
+      Serial.println(F("Configuration"));
+      configManager.printConfig();
+      break;
+    case 'p':
+      Serial.println(F("Send ping frame"));
+      if (!radio.isReady()) {
+        Serial.println(F("Radio is not ready, please configure it properly before using this command."));
         break;
-      case 'p':
-        Serial.println(F("Send ping frame"));
-        if (!radio.isReady()) {
-          Serial.println(F("Radio is not ready, please configure it properly before using this command."));
-          break;
-        }
-        radio.sendPing();
+      }
+      radio.sendPing();
+      break;
+    case 'q':
+      Serial.println(F("Send pong frame (testing)"));
+      if (!radio.isReady()) {
+        Serial.println(F("Radio is not ready, please configure it properly before using this command."));
         break;
-      case 'i':
-        Serial.println(F("Request satellite info"));
-        if (!radio.isReady()) {
-          Serial.println(F("Radio is not ready, please configure it properly before using this command."));
-          break;
-        }
-        radio.requestInfo();
+      }
+      radio.sendFrame(0x10,"");
+      break;  
+    case 'i':
+      Serial.println(F("Request satellite info"));
+      if (!radio.isReady()) {
+        Serial.println(F("Radio is not ready, please configure it properly before using this command."));
         break;
-      case 'l':
-        Serial.println(F("Request last packet info"));
-        if (!radio.isReady()) {
-          Serial.println(F("Radio is not ready, please configure it properly before using this command."));
-          break;
-        }
-        radio.requestPacketInfo();
+      }
+      radio.requestInfo();
+      break;
+    case 'l':
+      Serial.println(F("Request last packet info"));
+      if (!radio.isReady()) {
+        Serial.println(F("Radio is not ready, please configure it properly before using this command."));
         break;
-      case 'r':
-        Serial.println(F("Send message to be retransmitted"));
-        if (!radio.isReady()) {
-          Serial.println(F("Radio is not ready, please configure it properly before using this command."));
-          break;
-        }
-        Serial.println(F("Enter message to be sent:"));
-        Serial.println(F("(max 32 characters, end with LF or CR+LF)"));
-        {
-          // get data to be retransmited
-          char optData[32];
-          uint8_t bufferPos = 0;
-          while(bufferPos < 32) {
-            while(!Serial.available());
-            char c = Serial.read();
-            Serial.print(c);
-            if((c != '\r') && (c != '\n')) {
-              optData[bufferPos] = c;
-              bufferPos++;
-            } else {
-              break;
-            }
-          }
-          optData[bufferPos] = '\0';
-
-          // wait for a bit to receive any trailing characters
-          delay(100);
-
-          // dump the serial buffer
-          while(Serial.available()) {
-            Serial.read();
-          }
-
-          Serial.println();
-          radio.requestRetransmit(optData);
-        }
+      }
+      radio.requestPacketInfo();
+      break;
+    case 'r':
+      Serial.println(F("Send message to be retransmitted"));
+      if (!radio.isReady()) {
+        Serial.println(F("Radio is not ready, please configure it properly before using this command."));
         break;
-      case 'e':
-        Serial.println(F("Erase board config and restart."));
-        Serial.print(F("Are you sure (y/N)?"));
-        while(!Serial.available());
-        {
+      }
+      Serial.println(F("Enter message to be sent:"));
+      Serial.println(F("(max 32 characters, end with LF or CR+LF)"));
+      {
+        // get data to be retransmited
+        char optData[32];
+        uint8_t bufferPos = 0;
+        while(bufferPos < 32) {
+          while(!Serial.available());
           char c = Serial.read();
-          Serial.println(c);
-          if((c == 'y') || (c == 'Y')) {
-            Serial.println(F("** Reset and restart ***"));
-            configManager.resetAllConfig();
-            ESP.restart();
+          Serial.print(c);
+          if((c != '\r') && (c != '\n')) {
+            optData[bufferPos] = c;
+            bufferPos++;
           } else {
-           Serial.println(F("abort - No changes made"));
+            break;
           }
         }
-        break;
-      case 't':
-        Serial.println(F("Change the test mode and restart"));
-        consoleSwitchTestmode();
-        ESP.restart();
-        break;
-      case 'b':
+        optData[bufferPos] = '\0';
+
+        // wait for a bit to receive any trailing characters
+        delay(100);
+
+        // dump the serial buffer
+        while(Serial.available()) {
+          Serial.read();
+        }
+
+        Serial.println();
+        radio.requestRetransmit(optData);
+      }
+      break;
+    case 'e':
+      Serial.println(F("Erase board config and restart."));
+      Serial.print(F("Are you sure (y/N)?"));
+      while(!Serial.available());
+      {
+        char c = Serial.read();
+        Serial.println(c);
+        if((c == 'y') || (c == 'Y')) {
+          Serial.println(F("** Reset and restart ***"));
+          configManager.resetAllConfig();
+          ESP.restart();
+        } else {
+          Serial.println(F("abort - No changes made"));
+        }
+      }
+      break;
+    case 't':
+      Serial.println(F("Change the test mode and restart"));
+      consoleSwitchTestmode();
+      ESP.restart();
+      break;
+    case 'b':
         Serial.println(F("Reboot the board"));
         ESP.restart();
         break;
-       
-      default:
-        Serial.print(F("Unknown command: "));
-        Serial.println(serialCmd);
-        break;
-    }
-
+    default:
+      Serial.print(F("Unknown command: "));
+      Serial.println(serialCmd);
+      break;
+  }
+  radio.enableInterrupt();
 }
 
 void consolePrintLocalTime()
