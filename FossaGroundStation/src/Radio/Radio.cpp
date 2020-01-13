@@ -417,11 +417,15 @@ void Radio::processReceivedFrame(uint8_t functionId, uint8_t *respOptData, size_
     default:
       Serial.println(F("Unknown function ID!"));
       {
-	Serial.printf("Function Id: %02x", functionId);
+	Serial.printf("Function Id: 0x%02x", functionId);
         Serial.println();
-	int i;
-	for (i=0; i<respLen; i++){
-	  Serial.printf(" %02x", respOptData[i]);
+	Serial.printf("Size of optional data: %d", respLen - 11);
+        Serial.println();
+	if(respLen >= 11) {
+	  int i;
+	  for (i=11; i<respLen; i++){
+	    Serial.printf(" %02x", respOptData[i]);
+	  }
 	}
 	Serial.println();
       }
