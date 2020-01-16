@@ -71,6 +71,7 @@
 #include "src/Status.h"
 #include "src/Radio/Radio.h"
 #include "src/ArduinoOTA/ArduinoOTA.h"
+#include "src/Emulator/Emulator.h"
 
 #if MQTT_MAX_PACKET_SIZE != 1000
 "Remeber to change libraries/PubSubClient/src/PubSubClient.h"
@@ -120,7 +121,7 @@ void wifiConnected() {
   configManager.delay(1000); // wait to show the connected screen
 
   mqtt.begin();
-
+  
   // TODO: Make this beautiful
   displayShowWaitingMqttConnection();
   printControls();
@@ -165,6 +166,8 @@ void setup() {
 	  }
   }
 
+  emulatorInit();
+  
   if (button_pushed) {
     configManager.resetAPConfig();
     ESP.restart();
@@ -219,12 +222,26 @@ void loop() {
         }
         radio.sendPing();
         break;
+      case 'q':
+        if (!radio.isReady()) {
+          Serial.println(F("Radio is not ready, please configure it properly before using this command."));
+          break;
+        }
+        emulatorRespondPong();
+        break;
       case 'i':
         if (!radio.isReady()) {
           Serial.println(F("Radio is not ready, please configure it properly before using this command."));
           break;
         }
         radio.requestInfo();
+        break;
+      case 'j':
+        if (!radio.isReady()) {
+          Serial.println(F("Radio is not ready, please configure it properly before using this command."));
+          break;
+        }
+        emulatorRespondSysInfo();
         break;
       case 'l':
         if (!radio.isReady()) {
@@ -333,7 +350,9 @@ void printLocalTime()
 void printControls() {
   Serial.println(F("------------- Controls -------------"));
   Serial.println(F("p - send ping frame"));
+  Serial.println(F("q - send pong frame (emulator)"));
   Serial.println(F("i - request satellite info"));
+  Serial.println(F("j - send satellite info (emulator)"));
   Serial.println(F("l - request last packet info"));
   Serial.println(F("r - send message to be retransmitted"));
   Serial.println(F("t - change the test mode and restart"));
