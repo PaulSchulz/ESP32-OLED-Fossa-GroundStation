@@ -3,6 +3,9 @@
 
   Copyright (C) 2020 @Paul_Schulz
 
+  Based on original Emulator code by @4m1g0 found at:
+  github:4m1g0/FossaSat-Micro-ESP32-Satellite-Emulator
+
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
