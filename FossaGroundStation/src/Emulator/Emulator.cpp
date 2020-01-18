@@ -55,104 +55,247 @@ void emulatorRespondPong() {
   Serial.println();
 };
 
-void emulatorRespondSysInfo() {
-  size_t optDataLen = 6*sizeof(uint8_t) + 3*sizeof(int16_t) + sizeof(uint16_t) + sizeof(int8_t);
-  uint8_t* optData = new uint8_t[optDataLen];
+void emulatorSysInfoZero(uint8_t* optData, size_t optDataLen) {
   uint8_t* optDataPtr = optData;
 
-  Serial.println(F("System info:"));
-
-  // set batteryChargingVoltage variable
-  uint8_t batteryChargingVoltage = ((float)random(1800, 3600) / 1000.0) * (VOLTAGE_UNIT / VOLTAGE_MULTIPLIER);
+  uint8_t batteryChargingVoltage = 0;
   memcpy(optDataPtr, &batteryChargingVoltage, sizeof(uint8_t));
   optDataPtr += sizeof(uint8_t);
-  Serial.print(batteryChargingVoltage);
-  Serial.print('*');
-  Serial.print(VOLTAGE_MULTIPLIER);
-  Serial.println(F(" mV"));
 
-  // set batteryChragingCurrent variable
-  int16_t batteryChragingCurrent = ((float)random(-50000, 50000) / 1000000.0) * (CURRENT_UNIT / CURRENT_MULTIPLIER);
-  memcpy(optDataPtr, &batteryChragingCurrent, sizeof(int16_t));
+  int16_t batteryChargingCurrent = 0;
+  memcpy(optDataPtr, &batteryChargingCurrent, sizeof(int16_t));
   optDataPtr += sizeof(int16_t);
-  Serial.print(batteryChragingCurrent);
-  Serial.print('*');
-  Serial.print(CURRENT_MULTIPLIER);
-  Serial.println(F(" uA"));
 
-  // set batteryVoltage variable
-  uint8_t batteryVoltage = ((float)random(1800, 3600) / 1000.0) * (VOLTAGE_UNIT / VOLTAGE_MULTIPLIER);
+  uint8_t batteryVoltage = 0;
   memcpy(optDataPtr, &batteryVoltage, sizeof(uint8_t));
   optDataPtr += sizeof(uint8_t);
-  Serial.print(batteryVoltage);
-  Serial.print('*');
-  Serial.print(VOLTAGE_MULTIPLIER);
-  Serial.println(F(" mV"));
 
-  // set solarCellAVoltage variable
-  uint8_t solarCellAVoltage = ((float)random(0, 330) / 100.0) * (VOLTAGE_UNIT / VOLTAGE_MULTIPLIER);
+  uint8_t solarCellAVoltage = 0;
   memcpy(optDataPtr, &solarCellAVoltage, sizeof(uint8_t));
   optDataPtr += sizeof(uint8_t);
-  Serial.print(solarCellAVoltage);
-  Serial.print('*');
-  Serial.print(VOLTAGE_MULTIPLIER);
-  Serial.println(F(" mV"));
 
-  // set solarCellBVoltage variable
-  uint8_t solarCellBVoltage = ((float)random(0, 330) / 100.0) * (VOLTAGE_UNIT / VOLTAGE_MULTIPLIER);
+  uint8_t solarCellBVoltage = 0;
   memcpy(optDataPtr, &solarCellBVoltage, sizeof(uint8_t));
   optDataPtr += sizeof(uint8_t);
-  Serial.print(solarCellBVoltage);
-  Serial.print('*');
-  Serial.print(VOLTAGE_MULTIPLIER);
-  Serial.println(F(" mV"));
 
-  // set solarCellCVoltage variable
-  uint8_t solarCellCVoltage = ((float)random(0, 330) / 100.0) * (VOLTAGE_UNIT / VOLTAGE_MULTIPLIER);
+  uint8_t solarCellCVoltage = 0;
   memcpy(optDataPtr, &solarCellCVoltage, sizeof(uint8_t));
   optDataPtr += sizeof(uint8_t);
-  Serial.print(solarCellCVoltage);
-  Serial.print('*');
-  Serial.print(VOLTAGE_MULTIPLIER);
-  Serial.println(F(" mV"));
 
-  // set batteryTemperature variable
-  int16_t batteryTemperature = ((float)random(-50000, 120000) / 1000.0) * (TEMPERATURE_UNIT / TEMPERATURE_MULTIPLIER);
+  int16_t batteryTemperature = 0;
   memcpy(optDataPtr, &batteryTemperature, sizeof(int16_t));
   optDataPtr += sizeof(int16_t);
-  Serial.print(batteryTemperature);
-  Serial.print('*');
-  Serial.print(TEMPERATURE_MULTIPLIER);
-  Serial.println(F(" mdeg C"));
 
-  // set boardTemperature variable
-  int16_t boardTemperature = ((float)random(-50000, 120000) / 1000.0) * (TEMPERATURE_UNIT / TEMPERATURE_MULTIPLIER);
+  int16_t boardTemperature = 0;
   memcpy(optDataPtr, &boardTemperature, sizeof(int16_t));
   optDataPtr += sizeof(int16_t);
-  Serial.print(boardTemperature);
-  Serial.print('*');
-  Serial.print(TEMPERATURE_MULTIPLIER);
-  Serial.println(F(" mdeg C"));
 
-  // set mcuTemperature variable (read twice since first value is often nonsense)
+  int8_t mcuTemperature = 0;
+  memcpy(optDataPtr, &mcuTemperature, sizeof(int8_t));
+  optDataPtr += sizeof(int8_t);
+
+  uint16_t resetCounter = 0;
+  memcpy(optDataPtr, &resetCounter, sizeof(uint16_t));
+  optDataPtr += sizeof(uint16_t);
+
+  uint8_t powerConfig = 0;
+  memcpy(optDataPtr, &powerConfig, sizeof(uint8_t));
+  optDataPtr += sizeof(uint8_t);
+
+}
+
+void emulatorSysInfoRandom(uint8_t* optData, size_t optDataLen) {
+  uint8_t* optDataPtr = optData;
+
+  // set batteryChargingVoltage variable
+  uint8_t batteryChargingVoltage
+    = ((float)random(1800, 3600) / 1000.0) * (VOLTAGE_UNIT / VOLTAGE_MULTIPLIER);
+  memcpy(optDataPtr, &batteryChargingVoltage, sizeof(uint8_t));
+  optDataPtr += sizeof(uint8_t);
+
+  // set batteryChragingCurrent variable
+  int16_t batteryChragingCurrent
+    = ((float)random(-50000, 50000) / 1000000.0) * (CURRENT_UNIT / CURRENT_MULTIPLIER);
+  memcpy(optDataPtr, &batteryChragingCurrent, sizeof(int16_t));
+  optDataPtr += sizeof(int16_t);
+
+  // set batteryVoltage variable
+  uint8_t batteryVoltage
+    = ((float)random(1800, 3600) / 1000.0) * (VOLTAGE_UNIT / VOLTAGE_MULTIPLIER);
+  memcpy(optDataPtr, &batteryVoltage, sizeof(uint8_t));
+  optDataPtr += sizeof(uint8_t);
+
+  // set solarCellAVoltage variable
+  uint8_t solarCellAVoltage
+    = ((float)random(0, 330) / 100.0) * (VOLTAGE_UNIT / VOLTAGE_MULTIPLIER);
+  memcpy(optDataPtr, &solarCellAVoltage, sizeof(uint8_t));
+  optDataPtr += sizeof(uint8_t);
+
+  // set solarCellBVoltage variable
+  uint8_t solarCellBVoltage
+    = ((float)random(0, 330) / 100.0) * (VOLTAGE_UNIT / VOLTAGE_MULTIPLIER);
+  memcpy(optDataPtr, &solarCellBVoltage, sizeof(uint8_t));
+  optDataPtr += sizeof(uint8_t);
+
+  // set solarCellCVoltage variable
+  uint8_t solarCellCVoltage
+    = ((float)random(0, 330) / 100.0) * (VOLTAGE_UNIT / VOLTAGE_MULTIPLIER);
+  memcpy(optDataPtr, &solarCellCVoltage, sizeof(uint8_t));
+  optDataPtr += sizeof(uint8_t);
+
+  // set batteryTemperature variable
+  int16_t batteryTemperature
+    = ((float)random(-50000, 120000) / 1000.0) * (TEMPERATURE_UNIT / TEMPERATURE_MULTIPLIER);
+  memcpy(optDataPtr, &batteryTemperature, sizeof(int16_t));
+  optDataPtr += sizeof(int16_t);
+
+  // set boardTemperature variable
+  int16_t boardTemperature
+    = ((float)random(-50000, 120000) / 1000.0) * (TEMPERATURE_UNIT / TEMPERATURE_MULTIPLIER);
+  memcpy(optDataPtr, &boardTemperature, sizeof(int16_t));
+  optDataPtr += sizeof(int16_t);
+
+  // set mcuTemperature variable
   int8_t mcuTemperature = random(0,300) - 150;
   memcpy(optDataPtr, &mcuTemperature, sizeof(int8_t));
   optDataPtr += sizeof(int8_t);
-  Serial.println(mcuTemperature);
 
   // set resetCounter variable
   uint16_t resetCounter = 3;
   memcpy(optDataPtr, &resetCounter, sizeof(uint16_t));
   optDataPtr += sizeof(uint16_t);
-  Serial.println(resetCounter);
 
   // set powerConfig variable
   uint8_t powerConfig = 0xFF;
-  Serial.print(F("Config: 0b"));
-  Serial.println(powerConfig, BIN);
   memcpy(optDataPtr, &powerConfig, sizeof(uint8_t));
   optDataPtr += sizeof(uint8_t);
+}
 
+void emulatorRespondSysInfo() {
+  size_t optDataLen = 6*sizeof(uint8_t) + 3*sizeof(int16_t) + sizeof(uint16_t) + sizeof(int8_t);
+  uint8_t* optData = new uint8_t[optDataLen];
+  uint8_t* optDataPtr = optData;
+
+  emulatorSysInfoRandom(optData, optDataLen);
+
+  Serial.println();
+  Serial.println(F("System info:"));
+
+  // batteryChargingVoltage
+  uint8_t batteryChargingVoltage = (uint8_t)(*optDataPtr);
+  optDataPtr += sizeof(uint8_t);
+  Serial.printf("  %-24s %5d   0x%2X * %d = %5d %s\n",
+		(char *)F("batteryChargingVoltage"),
+		batteryChargingVoltage,
+		batteryChargingVoltage,
+		VOLTAGE_MULTIPLIER,
+		(batteryChargingVoltage * VOLTAGE_MULTIPLIER),
+		(char *)F("mV"));
+  
+  // batteryChargingCurrent
+  int16_t batteryChargingCurrent = (int16_t)*optDataPtr;
+  optDataPtr += sizeof(int16_t);
+  Serial.printf("  %-24s %5d 0x%04X * %d = %5d %s\n",
+		(char *)F("batteryChargingCurrent"),
+		batteryChargingCurrent,
+		batteryChargingCurrent,
+		CURRENT_MULTIPLIER,
+		(batteryChargingCurrent * CURRENT_MULTIPLIER),
+		(char *)F("uA"));
+
+  // batteryVoltage
+  uint8_t batteryVoltage = (uint8_t)*optDataPtr;
+  optDataPtr += sizeof(uint8_t);
+  Serial.printf("  %-24s %5d   0x%02X * %d = %5d %s\n",
+		(char *)F("batteryVoltage"),
+		batteryVoltage,
+		batteryVoltage,
+		VOLTAGE_MULTIPLIER,
+		(batteryVoltage * VOLTAGE_MULTIPLIER),
+		(char *)F("mV"));
+
+  // solarCellAVoltage
+  uint8_t solarCellAVoltage = (uint8_t)*optDataPtr;
+  optDataPtr += sizeof(uint8_t);
+  Serial.printf("  %-24s %5d   0x%02X * %d = %5d %s\n",
+		(char *)F("solarCellAVoltage"),
+		solarCellAVoltage,
+		solarCellAVoltage,
+		VOLTAGE_MULTIPLIER,
+		(solarCellAVoltage * VOLTAGE_MULTIPLIER),
+		(char *)F("mV"));
+
+  // solarCellBVoltage
+  uint8_t solarCellBVoltage = (uint8_t)*optDataPtr;
+  optDataPtr += sizeof(uint8_t);
+  Serial.printf("  %-24s %5d   0x%02X * %d = %5d %s\n",
+		(char *)F("solarCellBVoltage"),
+		solarCellBVoltage,
+		solarCellBVoltage,
+		VOLTAGE_MULTIPLIER,
+		(solarCellBVoltage * VOLTAGE_MULTIPLIER),
+		(char *)F("mV"));
+
+  // solarCellCVoltage
+  uint8_t solarCellCVoltage =  (uint8_t)*optDataPtr;
+  optDataPtr += sizeof(uint8_t);
+  Serial.printf("  %-24s %5d   0x%02X * %d = %5d %s\n",
+		(char *)F("solarCellCVoltage"),
+		solarCellCVoltage,
+		solarCellCVoltage,
+		VOLTAGE_MULTIPLIER,
+		(solarCellCVoltage * VOLTAGE_MULTIPLIER),
+		(char *)F("mV"));
+
+  // batteryTemperature
+  int16_t batteryTemperature = (uint16_t)*optDataPtr;
+  optDataPtr += sizeof(int16_t);
+  Serial.printf("  %-24s %5d 0x%04X * %d = %5d %s\n",
+		(char *)F("batteryTemperature"),
+		batteryTemperature,
+		batteryTemperature,
+		TEMPERATURE_MULTIPLIER,
+		(batteryTemperature * TEMPERATURE_MULTIPLIER),
+		(char *)F("mdeg C"));
+
+  // boardTemperature
+  int16_t boardTemperature = (int16_t)*optDataPtr;
+  optDataPtr += sizeof(int16_t);
+  Serial.printf("  %-24s %5d 0x%04X * %d = %5d %s\n",
+		(char *)F("boardTemperature"),
+		boardTemperature,
+		boardTemperature,
+		TEMPERATURE_MULTIPLIER,
+		(boardTemperature * TEMPERATURE_MULTIPLIER),
+		(char *)F("mdeg C"));
+
+  // mcuTemperature
+  int8_t mcuTemperature = (int8_t)*optDataPtr;
+  optDataPtr += sizeof(int8_t);
+  Serial.printf("  %-24s %5d   0x%02X * %d = %5d %s\n",
+		(char *)F("mcuTemperature"),
+		mcuTemperature,
+		(uint8_t) mcuTemperature,
+		TEMPERATURE_MULTIPLIER,
+		(mcuTemperature * TEMPERATURE_MULTIPLIER),
+		(char *)F("mdeg C"));
+  
+  // resetCounter
+  uint16_t resetCounter = (uint16_t)*optDataPtr;
+  optDataPtr += sizeof(uint16_t);
+  Serial.printf("  %-24s                   = %5d %s\n",
+		(char *)F("resetCounter"),
+		resetCounter,
+		(char *)F("counts"));
+  
+  // powerConfig
+  uint8_t powerConfig = (uint8_t)*optDataPtr;
+  optDataPtr += sizeof(uint8_t);
+
+  Serial.printf("  %-24s                   = 0b",
+		(char *)F("powerConfig"));
+  Serial.println(powerConfig, BIN);
+    
   Serial.print(F("Sending sysInfo frame ... "));
   uint8_t functionId = RESP_SYSTEM_INFO;
   int state = 0;
