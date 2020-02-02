@@ -39,7 +39,7 @@ public:
   void disableInterrupt();
   uint8_t listen();
   bool isReady() { return ready; }
-  int sendFrame(uint8_t functionId, const char* data = "");
+  int sendFrame(uint8_t functionId, const char* data = "", int dataLen = 0);
 
 private:
   PhysicalLayer* lora;

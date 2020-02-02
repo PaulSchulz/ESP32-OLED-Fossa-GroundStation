@@ -42,7 +42,7 @@ void emulatorRespondPong() {
   int state = 0;
 
   Serial.print(F("Sending pong frame ... "));
-  state = radio.sendFrame(functionId,"");
+  state = radio.sendFrame(functionId);
 
   if (state == ERR_NONE) {
     Serial.println(F("sent successfully!"));
@@ -193,7 +193,8 @@ void emulatorRespondSysInfo() {
 		(char *)F("mV"));
   
   // batteryChargingCurrent
-  int16_t batteryChargingCurrent = (int16_t)*optDataPtr;
+  // DEBUG
+  int16_t batteryChargingCurrent = *optDataPtr + 0x100 * *(optDataPtr+1);
   optDataPtr += sizeof(int16_t);
   Serial.printf("  %-24s %5d 0x%04X * %d = %5d %s\n",
 		(char *)F("batteryChargingCurrent"),
@@ -256,10 +257,11 @@ void emulatorRespondSysInfo() {
 		batteryTemperature,
 		TEMPERATURE_MULTIPLIER,
 		(batteryTemperature * TEMPERATURE_MULTIPLIER),
-		(char *)F("mdeg C"));
+		(char *)F("mdeg-C"));
 
   // boardTemperature
-  int16_t boardTemperature = (int16_t)*optDataPtr;
+  // DEBUG
+  int16_t boardTemperature = *optDataPtr + 0x100 * *(optDataPtr + 1);
   optDataPtr += sizeof(int16_t);
   Serial.printf("  %-24s %5d 0x%04X * %d = %5d %s\n",
 		(char *)F("boardTemperature"),
@@ -267,7 +269,7 @@ void emulatorRespondSysInfo() {
 		boardTemperature,
 		TEMPERATURE_MULTIPLIER,
 		(boardTemperature * TEMPERATURE_MULTIPLIER),
-		(char *)F("mdeg C"));
+		(char *)F("mdeg-C"));
 
   // mcuTemperature
   int8_t mcuTemperature = (int8_t)*optDataPtr;
@@ -278,28 +280,44 @@ void emulatorRespondSysInfo() {
 		(uint8_t) mcuTemperature,
 		TEMPERATURE_MULTIPLIER,
 		(mcuTemperature * TEMPERATURE_MULTIPLIER),
-		(char *)F("mdeg C"));
+		(char *)F("mdeg-C"));
   
   // resetCounter
-  uint16_t resetCounter = (uint16_t)*optDataPtr;
+  // DEBUG
+  uint16_t resetCounter = *optDataPtr + (*(optDataPtr + 1)<<8);
   optDataPtr += sizeof(uint16_t);
-  Serial.printf("  %-24s                   = %5d %s\n",
+  Serial.printf("  %-24s %5d 0x%04X *  1 = %5d %s\n",
 		(char *)F("resetCounter"),
 		resetCounter,
-		(char *)F("counts"));
+		resetCounter,
+		resetCounter,
+		(char *)F("counts")
+		);
   
   // powerConfig
   uint8_t powerConfig = (uint8_t)*optDataPtr;
   optDataPtr += sizeof(uint8_t);
 
-  Serial.printf("  %-24s                   = 0b",
-		(char *)F("powerConfig"));
+  Serial.printf("  %-24s %5d   0x%02X *  1 = 0b",
+		(char *)F("powerConfig"),
+                powerConfig,
+		powerConfig
+		);
   Serial.println(powerConfig, BIN);
-    
+
+  Serial.print("Frame ");
+  {
+    int i = 0;
+    for (i=0; i<optDataLen; i++){
+      Serial.printf("-%02X",optData[i]);
+    }
+    Serial.println();
+  }
+  
   Serial.print(F("Sending sysInfo frame ... "));
   uint8_t functionId = RESP_SYSTEM_INFO;
   int state = 0;
-  state = radio.sendFrame(functionId,(char *)optDataPtr);
+  state = radio.sendFrame(functionId, (char *)optData, optDataLen);
 
   if (state == ERR_NONE) {
     Serial.println(F("sent successfully!"));

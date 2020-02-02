@@ -130,9 +130,10 @@ void Radio::disableInterrupt() {
   eInterrupt = false;
 }
 
-int Radio::sendFrame(uint8_t functionId, const char* data) {
+int Radio::sendFrame(uint8_t functionId, const char* data, int dataLen) {
   // build frame
-  uint8_t optDataLen = strlen(data);
+  //uint8_t optDataLen = strlen(data);
+  uint8_t optDataLen = dataLen;
 
   // build frame
   uint8_t len = FCP_Get_Frame_Length(callsign, optDataLen);
@@ -142,6 +143,13 @@ int Radio::sendFrame(uint8_t functionId, const char* data) {
   else
     FCP_Encode(frame, callsign, functionId);
 
+  // Debug
+  Serial.print("DEBUG: optDataLen: ");
+  Serial.println(optDataLen);
+
+  Serial.print("DEBUG: len:        ");
+  Serial.println(len);
+  
   // send data
   int state = 0;
   if (configManager.getBoardConfig().L_SX127X) {
@@ -206,7 +214,8 @@ void Radio::requestPacketInfo() {
 
 void Radio::requestRetransmit(char* data) {
   Serial.print(F("Requesting retransmission ... "));
-  int state = sendFrame(CMD_RETRANSMIT, data);
+  // DEBUG
+  int state = sendFrame(CMD_RETRANSMIT, data, strlen(data));
   // check transmission success
   if (state == ERR_NONE) {
     Serial.println(F("sent successfully!"));
